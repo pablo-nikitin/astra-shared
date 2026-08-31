@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "astra-shared"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+db = ["sqlalchemy[asyncio]>=2.0,<3", "asyncpg>=0.31,<1"]
+telegram = []
+max = []
+payments = ["httpx>=0.28,<1"]
+observability = ["sentry-sdk>=2.0,<3"]
+all = ["astra-shared[db,telegram,max,payments,observability]"]
+test = ["pytest>=8,<9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/astra_shared"]
