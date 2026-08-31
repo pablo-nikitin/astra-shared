@@ -115,4 +115,7 @@ class City(Base):
     lat: Mapped[float] = mapped_column(Float, nullable=False)
     lng: Mapped[float] = mapped_column(Float, nullable=False)
     timezone: Mapped[str] = mapped_column(String(64), nullable=False)
-    is_popular: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
+    # Не строго население — просто ранжирующий ключ для сортировки
+    # автокомплита/списка по умолчанию; удобно заполнять населением при
+    # сидинге, но допускает и ручную курировку.
+    sorting: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
