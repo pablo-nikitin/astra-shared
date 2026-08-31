@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from astra_shared.db.models import User, UserIdentity, utc_now_naive
+from astra_shared.identity_contract import generate_referral_code
 
 
 class UserRepository:
@@ -22,6 +23,21 @@ class UserRepository:
         user = await self.get_by_uuid(user_uuid)
         if user is not None:
             user.referral_count += 1
+
+    async def ensure_referral_code(self, user: User) -> str:
+        if user.referral_code:
+            return user.referral_code
+        # Коллизии не проверяются — то же допущение, что и в проде astra
+        # (8 hex-символов uuid4, полагается на уникальность в БД).
+        user.referral_code = generate_referral_code()
+        await self._session.commit()
+        return user.referral_code
+
+    async def get_identity(self, provider: str, external_id: str) -> UserIdentity | None:
+        result = await self._session.execute(
+            select(UserIdentity).where(UserIdentity.provider == provider, UserIdentity.external_id == str(external_id))
+        )
+        return result.scalar_one_or_none()
 
     async def _get_by_identity(self, provider: str, external_id: str) -> User | None:
         result = await self._session.execute(

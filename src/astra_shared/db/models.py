@@ -1,7 +1,7 @@
 import uuid as uuid_lib
 from datetime import UTC, date, datetime, time
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, String, UniqueConstraint, text
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, UniqueConstraint, text
 from sqlalchemy import Date as SqlDate
 from sqlalchemy import Time as SqlTime
 from sqlalchemy.dialects.postgresql import UUID
@@ -32,6 +32,10 @@ class User(Base):
     referred_by: Mapped[str | None] = mapped_column(String(50), nullable=True)
     referral_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     onboarding: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    birth_place_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("cities.id", ondelete="SET NULL"), nullable=True
+    )
+    zodiac_sign: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=utc_now_naive,
@@ -86,7 +90,11 @@ class Payment(Base):
     user_uuid: Mapped[str | None] = mapped_column(
         UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="SET NULL"), nullable=True, index=True
     )
+    user_identity_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("user_identities.id", ondelete="SET NULL"), nullable=True
+    )
     source_provider: Mapped[str] = mapped_column(String(32), nullable=False, default="telegram")
+    idempotency_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
     tokens: Mapped[int] = mapped_column(Integer, nullable=False)
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending")
@@ -94,3 +102,17 @@ class Payment(Base):
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class City(Base):
+    # DDL — у astra, не у astra-app: `users.birth_place_id` ссылается на эту
+    # таблицу, а `users` мигрирует astra (docs/architecture.md §3.3).
+    __tablename__ = "cities"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    country: Mapped[str] = mapped_column(String(255), nullable=False)
+    lat: Mapped[float] = mapped_column(Float, nullable=False)
+    lng: Mapped[float] = mapped_column(Float, nullable=False)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False)
+    population: Mapped[int | None] = mapped_column(Integer, nullable=True)
