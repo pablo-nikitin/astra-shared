@@ -116,3 +116,4 @@ class City(Base):
     lng: Mapped[float] = mapped_column(Float, nullable=False)
     timezone: Mapped[str] = mapped_column(String(64), nullable=False)
     population: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    is_popular: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
