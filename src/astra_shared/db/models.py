@@ -119,3 +119,4 @@ class City(Base):
     # автокомплита/списка по умолчанию; удобно заполнять населением при
     # сидинге, но допускает и ручную курировку.
     sorting: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
+    region: Mapped[str | None] = mapped_column(String(255), nullable=True)
