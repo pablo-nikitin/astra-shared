@@ -1,7 +1,7 @@
 import uuid as uuid_lib
 from datetime import UTC, date, datetime, time
 
-from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, UniqueConstraint, text
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
 from sqlalchemy import Date as SqlDate
 from sqlalchemy import Time as SqlTime
 from sqlalchemy.dialects.postgresql import UUID
@@ -103,6 +103,44 @@ class Payment(Base):
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class TokenTariff(Base):
+    # DDL — у astra (общий каталог цен с ботом, не только у мини-аппа).
+    __tablename__ = "token_tariffs"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    tokens: Mapped[int] = mapped_column(Integer, nullable=False)
+    price_kopeks: Mapped[int] = mapped_column(Integer, nullable=False)
+    old_price_kopeks: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    discount_percent: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    is_best_offer: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text("0"))
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("true"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, onupdate=utc_now_naive)
+
+
+class Dream(Base):
+    # DDL — у astra. Сонник (astra-app) хранит сны в общей базе, как и
+    # остальные данные пользователя.
+    __tablename__ = "dreams"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
+    )
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    dream_text: Mapped[str] = mapped_column(Text, nullable=False)
+    title: Mapped[str | None] = mapped_column(Text, nullable=True)
+    visual_prompt: Mapped[str | None] = mapped_column(Text, nullable=True)
+    interpretation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    image_path: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'draft'"))
+    interpreted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, onupdate=utc_now_naive)
 
 
 class City(Base):
