@@ -25,6 +25,7 @@ class User(Base):
         UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
     )
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    mail: Mapped[str | None] = mapped_column(String(255), nullable=True)
     birthday: Mapped[date | None] = mapped_column(SqlDate, nullable=True)
     birth_time: Mapped[time | None] = mapped_column(SqlTime, nullable=True)
     token: Mapped[int] = mapped_column(Integer, server_default=text("0"))

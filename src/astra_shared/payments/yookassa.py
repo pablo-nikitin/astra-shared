@@ -20,17 +20,22 @@ async def create_payment(
     description: str,
     return_url: str,
     metadata: dict[str, str],
+    receipt: dict | None = None,
 ) -> dict:
+    payload = {
+        "amount": {"value": f"{amount_rub}.00", "currency": "RUB"},
+        "confirmation": {"type": "redirect", "return_url": return_url},
+        "capture": True,
+        "description": description,
+        "metadata": metadata,
+    }
+    if receipt is not None:
+        payload["receipt"] = receipt
+
     response = await client.post(
         "/payments",
         headers={**_auth_header(shop_id, secret_key), "Idempotence-Key": idempotence_key},
-        json={
-            "amount": {"value": f"{amount_rub}.00", "currency": "RUB"},
-            "confirmation": {"type": "redirect", "return_url": return_url},
-            "capture": True,
-            "description": description,
-            "metadata": metadata,
-        },
+        json=payload,
     )
     response.raise_for_status()
     return response.json()
