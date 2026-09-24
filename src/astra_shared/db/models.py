@@ -4,7 +4,7 @@ from datetime import UTC, date, datetime, time
 from sqlalchemy import BigInteger, Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
 from sqlalchemy import Date as SqlDate
 from sqlalchemy import Time as SqlTime
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -141,6 +141,30 @@ class Dream(Base):
     interpreted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, onupdate=utc_now_naive)
+
+
+class TarotSpread(Base):
+    # DDL — у astra. Расклады Таро (astra-app) в общей базе, как и сны.
+    __tablename__ = "tarot_spreads"
+    __table_args__ = (
+        UniqueConstraint("user_uuid", "idempotency_key", name="uq_tarot_spreads_user_uuid_idempotency_key"),
+        Index("ix_tarot_spreads_user_uuid_created_at", "user_uuid", "created_at"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
+    )
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    idempotency_key: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
+    type: Mapped[str] = mapped_column(String(32), nullable=False)
+    question: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cards: Mapped[list[dict]] = mapped_column(JSONB, nullable=False)
+    answer: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    interpretation: Mapped[str] = mapped_column(Text, nullable=False)
+    discuss_group_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class City(Base):
