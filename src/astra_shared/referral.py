@@ -24,5 +24,4 @@ async def award_onboarding_bonus(session: AsyncSession, referred_user_uuid: str)
         reason_type="referral_signup_bonus", reference_type="referrer", reference_id=referrer.uuid,
         comment="welcome_gift_for_referred_user",
     )
-    await repository.increment_referral_count(referrer.uuid)
     await session.commit()

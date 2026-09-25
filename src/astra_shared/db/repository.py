@@ -19,11 +19,6 @@ class UserRepository:
         result = await self._session.execute(select(User).where(User.referral_code == referral_code))
         return result.scalar_one_or_none()
 
-    async def increment_referral_count(self, user_uuid: str) -> None:
-        user = await self.get_by_uuid(user_uuid)
-        if user is not None:
-            user.referral_count += 1
-
     async def ensure_referral_code(self, user: User) -> str:
         if user.referral_code:
             return user.referral_code

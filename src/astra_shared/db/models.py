@@ -31,12 +31,10 @@ class User(Base):
     token: Mapped[int] = mapped_column(Integer, server_default=text("0"))
     referral_code: Mapped[str | None] = mapped_column(String(50), nullable=True, unique=True)
     referred_by: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    referral_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
     onboarding: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     birth_place_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("cities.id", ondelete="SET NULL"), nullable=True
     )
-    zodiac_sign: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=utc_now_naive,
