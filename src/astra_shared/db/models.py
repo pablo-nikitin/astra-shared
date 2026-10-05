@@ -165,6 +165,37 @@ class TarotSpread(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
+class NatalChart(Base):
+    # DDL — у astra. Натальные карты мини-аппа: своя (is_own) и построенные для других.
+    # Входные данные рождения и снимок координат/пояса хранятся, чтобы карту
+    # можно было пересчитать; chart — снимок расчёта, на который опирается interpretation.
+    __tablename__ = "natal_charts"
+    __table_args__ = (Index("ix_natal_charts_user_uuid_is_own_created_at", "user_uuid", "is_own", "created_at"),)
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
+    )
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    is_own: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    birth_date: Mapped[date] = mapped_column(SqlDate, nullable=False)
+    birth_time: Mapped[time] = mapped_column(SqlTime, nullable=False)
+    birth_place_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("cities.id"), nullable=False)
+    lat: Mapped[float] = mapped_column(Float, nullable=False)
+    lng: Mapped[float] = mapped_column(Float, nullable=False)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False)
+    house_system: Mapped[str] = mapped_column(String(32), nullable=False)
+    engine_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    chart: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, server_default=text("'calculated'"))
+    interpretation: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    discuss_group_uuid: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
+    interpreted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+
+
 class City(Base):
     # DDL — у astra, не у astra-app: `users.birth_place_id` ссылается на эту
     # таблицу, а `users` мигрирует astra (docs/architecture.md §3.3).
