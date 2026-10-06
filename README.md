@@ -15,3 +15,8 @@
   кода и не коммитят, `credit`/`debit` коммитят сами. Повтор с тем же
   `(reason_type, reference_type, reference_id)` не меняет баланс. `amount`
   должен быть больше нуля.
+- `astra_shared.referral` (extra `db`) — бонус 3 + 3 сообщения пригласившему и
+  приглашённой за онбординг. `award_onboarding_bonus_in_session` работает в
+  транзакции вызывающего кода, `award_onboarding_bonus` коммитит. Обе
+  возвращают `OnboardingBonusResult` (начислено ли этим вызовом, новые
+  балансы) или `None`, если бонус не положен.
