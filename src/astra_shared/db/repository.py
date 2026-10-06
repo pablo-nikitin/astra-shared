@@ -43,6 +43,11 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     async def get_or_create_by_identity(self, provider: str, external_id: str) -> tuple[User, bool]:
+        # Стартовые сообщения (initial_free_messages) здесь не начисляются, а
+        # astra начисляет их при создании пользователя в
+        # UserRepository._grant_initial_free_messages. Пока бот на онбординге v2,
+        # это 0 и расхождения нет. Если вернуть v1 (5 сообщений), пользователи
+        # astra-app останутся без них — тогда начисление нужно перенести сюда.
         existing = await self._get_by_identity(provider, external_id)
         if existing is not None:
             return existing, False
