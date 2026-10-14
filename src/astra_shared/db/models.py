@@ -35,6 +35,8 @@ class User(Base):
     birth_place_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("cities.id", ondelete="SET NULL"), nullable=True
     )
+    # IANA-пояс пользователя: по нему «сегодня» и календарные дни.
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False, server_default=text("'Europe/Moscow'"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=utc_now_naive,
@@ -193,6 +195,26 @@ class NatalChart(Base):
     interpretation: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     discuss_group_uuid: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
     interpreted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+
+
+class HoroscopeDay(Base):
+    # DDL — у astra. Открытый (купленный) день гороскопа мини-аппа: снимок
+    # посчитанного дня, чтобы купленный текст не менялся при правке шаблонов.
+    # Факт оплаты — строка token_transactions (HOROSCOPE_DAY_UNLOCK_*), не эта таблица.
+    __tablename__ = "horoscope_days"
+    __table_args__ = (UniqueConstraint("user_uuid", "date", name="uq_horoscope_days_user_uuid_date"),)
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
+    )
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    date: Mapped[date] = mapped_column(SqlDate, nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    content_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    discuss_group_uuid: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
