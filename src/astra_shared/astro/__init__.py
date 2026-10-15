@@ -16,6 +16,14 @@ from astra_shared.astro.horoscope import (
     present_horoscope,
 )
 from astra_shared.astro.moon import MoonPhase, moon_phases
+from astra_shared.astro.moon_calendar import (
+    MOON_CALENDAR_CONTENT_VERSION,
+    Location,
+    MoonCalendar,
+    present_day,
+    present_month,
+    present_personal,
+)
 from astra_shared.astro.natal import (
     NatalChart,
     build_natal_chart,
@@ -30,9 +38,12 @@ __all__ = [
     "HOROSCOPE_DAY_UNLOCK_PRICE",
     "HOROSCOPE_DAY_UNLOCK_REASON",
     "HOROSCOPE_DAY_UNLOCK_REFERENCE",
+    "MOON_CALENDAR_CONTENT_VERSION",
     "PLANETS",
     "SIGNS",
     "Ephemeris",
+    "Location",
+    "MoonCalendar",
     "MoonPhase",
     "NatalChart",
     "build_natal_chart",
@@ -41,6 +52,9 @@ __all__ = [
     "mean_lilith_longitude",
     "mean_lunar_node_longitude",
     "moon_phases",
+    "present_day",
     "present_horoscope",
+    "present_month",
+    "present_personal",
     "sign_of",
 ]

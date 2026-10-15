@@ -218,6 +218,25 @@ class HoroscopeDay(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
+class MoonDay(Base):
+    # DDL — у astra. Лунный день мини-аппа: снимок разбора дня на момент первого
+    # просмотра вместе с группой обсуждения — повторный просмотр его не пересчитывает.
+    __tablename__ = "moon_days"
+    __table_args__ = (UniqueConstraint("user_uuid", "date", name="uq_moon_days_user_uuid_date"),)
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4())
+    )
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    date: Mapped[date] = mapped_column(SqlDate, nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    content_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    discuss_group_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+
+
 class City(Base):
     # DDL — у astra, не у astra-app: `users.birth_place_id` ссылается на эту
     # таблицу, а `users` мигрирует astra (docs/architecture.md §3.3).
