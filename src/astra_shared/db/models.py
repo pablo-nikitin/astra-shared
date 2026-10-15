@@ -214,7 +214,7 @@ class HoroscopeDay(Base):
     date: Mapped[date] = mapped_column(SqlDate, nullable=False)
     content: Mapped[dict] = mapped_column(JSONB, nullable=False)
     content_version: Mapped[str] = mapped_column(String(32), nullable=False)
-    discuss_group_uuid: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
+    discuss_group_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
