@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "astra-shared"
-version = "0.13.0"
+version = "0.14.0"
 requires-python = ">=3.11"
 dependencies = []
 
@@ -15,7 +15,8 @@ max = []
 payments = ["httpx>=0.28,<1"]
 observability = ["sentry-sdk>=2.0,<3"]
 astro = ["skyfield>=1.49,<2", "numpy>=1.26"]
-all = ["astra-shared[db,telegram,max,payments,observability,astro]"]
+gender = ["pymorphy3>=2.0.0", "pymorphy3-dicts-ru>=2.4.0"]
+all = ["astra-shared[db,telegram,max,payments,observability,astro,gender]"]
 test = ["pytest>=8,<9"]
 
 [tool.hatch.build.targets.wheel]
