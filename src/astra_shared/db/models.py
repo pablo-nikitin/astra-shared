@@ -35,6 +35,11 @@ class User(Base):
     birth_place_id: Mapped[int | None] = mapped_column(
         BigInteger, ForeignKey("cities.id", ondelete="SET NULL"), nullable=True
     )
+    residence_place_id: Mapped[int | None] = mapped_column(
+        BigInteger, ForeignKey("cities.id", ondelete="SET NULL"), nullable=True
+    )
+    # female / male / unknown (см. astra_shared.gender); NULL — ещё не определяли.
+    gender: Mapped[str | None] = mapped_column(String(16), nullable=True)
     # IANA-пояс пользователя: по нему «сегодня» и календарные дни.
     timezone: Mapped[str] = mapped_column(String(64), nullable=False, server_default=text("'Europe/Moscow'"))
     created_at: Mapped[datetime] = mapped_column(
