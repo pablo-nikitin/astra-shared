@@ -27,6 +27,12 @@
     (статичные, правка — повод поднять `MOON_CALENDAR_CONTENT_VERSION`).
     Поиск событий (лунации, смены знаков, аспекты Луны, станции, затмения,
     восходы Луны) — методы `Ephemeris`.
+- `astra_shared.promo` (extra `db`) — цена натальной карты `NATAL_CHART_PRICE`
+  (200 гемов) и подарки акций из `user_entitlements`: `active_entitlement`
+  находит действующий подарок функции (`FEATURE_HOROSCOPE_DAY`,
+  `FEATURE_DREAM_INTERPRETATION`), `use_entitlement_in_session` расходует
+  поштучный. Выдаёт подарки бот (astra), платная функция мини-аппа до
+  списания гемов проверяет подарок.
 - `astra_shared.db.ledger` (extra `db`) — изменение `users.token` вместе с
   записью `token_transactions`. Баланс меняется атомарным
   `UPDATE ... SET token = token ± amount` (списание — только при достаточном

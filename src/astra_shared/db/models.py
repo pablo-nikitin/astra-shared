@@ -242,6 +242,22 @@ class MoonDay(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
+class UserEntitlement(Base):
+    __tablename__ = "user_entitlements"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_uuid: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False
+    )
+    feature: Mapped[str] = mapped_column(String(64), nullable=False)
+    starts_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    uses_left: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+
+
 class City(Base):
     # DDL — у astra, не у astra-app: `users.birth_place_id` ссылается на эту
     # таблицу, а `users` мигрирует astra (docs/architecture.md §3.3).
