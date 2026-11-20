@@ -242,6 +242,31 @@ class MoonDay(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
+class FutureForecast(Base):
+    __tablename__ = "future_forecasts"
+    __table_args__ = (
+        UniqueConstraint("user_uuid", "category", "period_start", name="uq_future_forecasts_user_category_start"),
+    )
+
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid_lib.uuid4()))
+    user_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), nullable=False)
+    category: Mapped[str] = mapped_column(String(24), nullable=False)
+    period_start: Mapped[date] = mapped_column(SqlDate, nullable=False)
+    period_end: Mapped[date] = mapped_column(SqlDate, nullable=False)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False)
+    content: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    discuss_group_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+
+
+class FutureForecastGeneration(Base):
+    __tablename__ = "future_forecast_generations"
+
+    user_uuid: Mapped[str] = mapped_column(UUID(as_uuid=False), ForeignKey("users.uuid", ondelete="CASCADE"), primary_key=True)
+    lease_id: Mapped[str] = mapped_column(UUID(as_uuid=False), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
 class City(Base):
     # DDL — у astra, не у astra-app: `users.birth_place_id` ссылается на эту
     # таблицу, а `users` мигрирует astra (docs/architecture.md §3.3).
