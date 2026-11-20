@@ -100,11 +100,18 @@ class Payment(Base):
         Integer, ForeignKey("user_identities.id", ondelete="SET NULL"), nullable=True
     )
     source_provider: Mapped[str] = mapped_column(String(32), nullable=False, default="telegram")
+    payment_provider: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="yookassa", server_default=text("'yookassa'")
+    )
+    provider_data: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    currency: Mapped[str] = mapped_column(
+        String(3), nullable=False, default="RUB", server_default=text("'RUB'")
+    )
     idempotency_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
     tokens: Mapped[int] = mapped_column(Integer, nullable=False)
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default="pending")
-    confirmation_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    confirmation_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
