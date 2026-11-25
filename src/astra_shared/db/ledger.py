@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import func, insert, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,6 +18,10 @@ class LedgerResult:
 
 
 class TokenLedgerService:
+    @staticmethod
+    async def cancel_debit_in_session(session: AsyncSession, transaction_id: int) -> bool:
+        return bool(await session.scalar(select(func.public.cancel_token_debit(transaction_id))))
+
     @staticmethod
     async def _existing_id(
         session: AsyncSession,
