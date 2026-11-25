@@ -81,6 +81,7 @@ class TokenTransaction(Base):
     )
     amount: Mapped[int] = mapped_column(Integer, nullable=False)
     direction: Mapped[str] = mapped_column(String(16), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, server_default="applied")
     reason_type: Mapped[str] = mapped_column(String(64), nullable=False)
     reference_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
     reference_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
